@@ -1,6 +1,34 @@
 package com.company;
 
-class MatrixThreads {
+class MatrixThreads implements Runnable{
+int start;
+int [][]a;
+int [][]b;
+int [][]d;
+int stop;
+int answer[][];
+
+public MatrixThreads(int[][]a , int[][]b, int[][]d, int _start, int _stop ){
+this.a = a;
+this.b = b;
+this.d = d;
+start = _start;
+stop = _stop;
+
+}
+@Override
+public void run(){
+    int size = a.length;
+    int answer[][] = new int[size][size];
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            for (int k = 0; k < size; k++) {
+                Main.answer[i][j] = Main.answer[i][j] + (Main.a[i][k] * Main.b[k][j]);
+            }
+        }
+    }
+}
+
 
 }
 
@@ -66,7 +94,21 @@ public class Main {
         startTime = System.nanoTime();
         // filler, make either a new class that extends thread, or have this one extend thread
         // figure out how to split work up into at least 2 more threads
-        int d[][] = multiplyParallel(a, b);
+        int d[][] = new[size][size];
+        MatrixThreads m1 = new MatrixThreads (a,b,d,_start:0,_stop:500);
+        MatrixThreads m2 = new MatrixThreads (a,b,d,_start:500,_stop:1000);
+        Thread t1 = new Thread(m1);
+        Thread t2 = new Thread(m2);
+        t1.start();
+        t2.start();
+        try{
+
+            t1.join();
+            t2.join(); 
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
+
         endTime = System.nanoTime();
         long parallelTime = endTime - startTime;
         System.out.println("Parallel Time " + parallelTime + " ns");
